@@ -405,7 +405,8 @@ export function KeywordBadgesAdvanced({
               return (
                 <Link
                   key={k.id}
-                  href={`/books/keywords/${k.id}`}
+                  // 🔄 CAMBIO AQUÍ: Apuntamos al buscador global enviando el ID de la palabra clave
+                  href={`/search?page=1&palabraId=${k.id}&sortBy=popular`}
                   className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${variantClass} shadow-sm hover:scale-105 transform transition`}
                 >
                   <span className="font-medium">{k.nombre}</span>

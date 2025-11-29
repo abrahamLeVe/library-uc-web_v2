@@ -71,7 +71,7 @@ export default async function Footer() {
               <h4 className="mb-3 text-sm font-semibold">Facultades</h4>
               <ul className="space-y-2 text-sm">
                 {facultades.map((fac) => {
-                  const href = `/faculty/${fac.id}`;
+                  const href = `/search?facultadId=${fac.id}`;
                   return (
                     <li key={fac.id}>
                       <Link

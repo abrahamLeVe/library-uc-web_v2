@@ -1,7 +1,5 @@
 import { TableBooksSkeleton } from "@/components/common/skeleton-entity";
 import Pagination from "@/components/search/pagination";
-import Search from "@/components/search/search";
-
 import SearchTable from "@/components/search/table";
 import { fetchBooksGlobalPages } from "@/lib/data/search.data";
 import { FilterParams } from "@/lib/definitions";
@@ -19,32 +17,56 @@ export default async function Page(props: {
 
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
+  const sortBy = searchParams?.sortBy || "az";
 
-  // ✅ AHORA PASAMOS LOS NUEVOS FILTROS TAMBIÉN A LA PAGINACIÓN
+  const facultadId = Number(searchParams?.facultadId) || null;
+  const carreraId = Number(searchParams?.carreraId) || null;
+  const especialidadId = Number(searchParams?.especialidadId) || null;
+  const autorId = Number(searchParams?.autorId) || null;
+  const palabraId = Number(searchParams?.palabraId) || null;
+  const yearMin = Number(searchParams?.yearMin) || null;
+  const yearMax = Number(searchParams?.yearMax) || null;
+
   const totalPages = await fetchBooksGlobalPages({
     query,
-    facultadId: Number(searchParams?.facultadId) || null,
-    carreraId: Number(searchParams?.carreraId) || null,
-    especialidadId: Number(searchParams?.especialidadId) || null,
-    yearMin: Number(searchParams?.yearMin) || null,
-    yearMax: Number(searchParams?.yearMax) || null,
+    facultadId,
+    carreraId,
+    especialidadId,
+    autorId,
+    palabraId,
+    yearMin,
+    yearMax,
+  });
+
+  const suspenseKey = JSON.stringify({
+    query,
+    currentPage,
+    facultadId,
+    carreraId,
+    especialidadId,
+    autorId,
+    palabraId,
+    yearMin,
+    yearMax,
+    sortBy,
   });
 
   return (
     <>
       <h2 className="text-xl md:text-2xl pb-1">Todos los libros</h2>
-      {/* <Search placeholder="Buscar libros..." /> */}
 
-      <Suspense key={query + currentPage} fallback={<TableBooksSkeleton />}>
+      <Suspense key={suspenseKey} fallback={<TableBooksSkeleton />}>
         <SearchTable
           query={query}
           currentPage={currentPage}
-          facultadId={Number(searchParams?.facultadId) || null}
-          carreraId={Number(searchParams?.carreraId) || null}
-          especialidadId={Number(searchParams?.especialidadId) || null}
-          yearMin={Number(searchParams?.yearMin) || null}
-          yearMax={Number(searchParams?.yearMax) || null}
-          sortBy={searchParams?.sortBy || "az"}
+          facultadId={facultadId}
+          carreraId={carreraId}
+          especialidadId={especialidadId}
+          autorId={autorId}
+          palabraId={palabraId}
+          yearMin={yearMin}
+          yearMax={yearMax}
+          sortBy={sortBy}
         />
       </Suspense>
 

@@ -1,6 +1,5 @@
-import { KeywordBadgesAdvanced } from "@/components/keywords/keywords-badges";
-import { TableSkeleton } from "@/components/common/skeleton-entity";
 import TableEntity from "@/components/common/table-entity";
+import { KeywordBadgesAdvanced } from "@/components/keywords/keywords-badges";
 import {
   fetchEntityConLibrosAll,
   fetchLibrosPorAnioAll,
@@ -8,7 +7,6 @@ import {
 import { fetchPalabrasClaveFullData } from "@/lib/data/Keywords.data";
 
 import { Metadata } from "next";
-import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Estadísticas Académicas",
@@ -43,33 +41,33 @@ export default async function StatisticsPage() {
     <>
       <h2 className="text-xl md:text-2xl pb-4">Estadísticas de Biblioteca</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Suspense fallback={<TableSkeleton col2="Carrera" />}>
-          <TableEntity
-            titleCol="Carrera"
-            basePath="/books/career"
-            data={carrerasData}
-          />
-        </Suspense>
+        <TableEntity
+          titleCol="Carrera"
+          basePath="/search"
+          data={carrerasData}
+          filterKey="carreraId"
+        />
 
-        <Suspense fallback={<TableSkeleton col2="Especialidad" />}>
-          <TableEntity
-            titleCol="Especialidad"
-            basePath="/books/speciality"
-            data={especialidadesData}
-          />
-        </Suspense>
+        <TableEntity
+          titleCol="Especialidad"
+          basePath="/search"
+          data={especialidadesData}
+          filterKey="especialidadId"
+        />
 
-        <Suspense fallback={<TableSkeleton col2="Autor" />}>
-          <TableEntity
-            titleCol="Autor"
-            basePath="/books/author"
-            data={autoresData}
-          />
-        </Suspense>
+        <TableEntity
+          titleCol="Autor"
+          basePath="/search"
+          data={autoresData}
+          filterKey="autorId"
+        />
 
-        <Suspense fallback={<TableSkeleton col2="Año" />}>
-          <TableEntity titleCol="Año" basePath="/books/anio" data={aniosData} />
-        </Suspense>
+        <TableEntity
+          titleCol="Año"
+          basePath="/search"
+          data={aniosData}
+          isYearTable={true}
+        />
       </div>
 
       <KeywordBadgesAdvanced data={palabrasClaveData} />

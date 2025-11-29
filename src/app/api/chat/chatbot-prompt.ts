@@ -1,31 +1,48 @@
 import { client_url } from "@/lib/urls";
-import { readSitemapFromURL } from "./downloadSitemap";
+import type { BookSearchResult } from "@/lib/data/book.data";
 
-export async function generateChatbotPrompt(): Promise<string> {
-  const sitemapURL = `${client_url}/sitemap.xml`;
-  const sitemapData = await readSitemapFromURL(sitemapURL);
+export function generateChatbotPrompt(libros: BookSearchResult[]): string {
+  let bookContext: string;
+
+  if (libros.length > 0) {
+    bookContext =
+      "He encontrado estos libros que coinciden con la búsqueda del usuario:\n\n" +
+      libros
+        .map(
+          (libro) =>
+            `  - Título: ${libro.titulo}\n` +
+            `    Autores: ${libro.autores}\n` +
+            `    Facultad: ${libro.facultad}\n` +
+            `    Carrera: ${libro.carrera}\n` +
+            `    Especialidad: ${libro.especialidad}\n` +
+            `    Enlace: [Ver detalles del libro](${client_url}/book/${libro.id})`
+        )
+        .join("\n\n");
+  } else {
+    bookContext =
+      "No he encontrado libros que coincidan con la búsqueda del usuario en la base de datos de la biblioteca.";
+  }
 
   const additionalInfo = `
-Esta es la biblioteca de la universidad. 
-Aquí los usuarios pueden buscar libros, tesis, artículos, tests, y materiales académicos organizados por facultad, carrera y especialidad. 
-Cada resultado incluye un enlace directo al libro correspondiente dentro del sitio: ${sitemapData}. 
-Solo se muestran hasta 4 resultados por respuesta.
+**Contexto de Búsqueda:**
+${bookContext}
 `;
 
   return `
 Eres un asistente virtual de biblioteca llamado **BiblioBot**, integrado en el sitio web ${client_url}.
-Tu función principal es ayudar a los estudiantes, docentes y visitantes a **encontrar libros y materiales académicos** disponibles en la biblioteca universitaria.
-
-Usas únicamente la información obtenida del sitemap del sitio (que contiene todos los libros y sus enlaces) para responder preguntas sobre los materiales disponibles.
+Tu función principal es ayudar a los estudiantes a **encontrar libros y materiales académicos** usando **únicamente** el "Contexto de Búsqueda" que te proporciono.
 
 ${additionalInfo}
 
-✅ Muestra resultados con el título del libro, su facultad, carrera y especialidad (si están disponibles).
-✅ Incluye enlaces directos al recurso (por ejemplo: ${client_url}/book/1404?Análisis%20Estructural).
-✅ Sé amable, claro y profesional al responder.
-⚠️ No inventes títulos ni autores que no existan en el sitemap.
-❌ No respondas preguntas fuera del ámbito académico o bibliotecario (por ejemplo, temas personales, de salud o no relacionados con libros).
+---
+**REGLAS ESTRICTAS:**
+✅ Responde basándote *exclusivamente* en la información del "Contexto de Búsqueda".
 
-Tu propósito es servir como un **asistente de búsqueda académica eficiente**, que facilita el acceso a los libros y recursos digitales de la biblioteca universitaria.
+// 🧠 CAMBIO 2: Actualizamos la regla para que el ejemplo sea en Markdown.
+✅ Si encuentras libros en el contexto, muéstralos amablemente. Incluye el título, autores y el enlace directo usando el formato Markdown: [texto descriptivo](enlace).
+
+✅ Si el contexto dice "No he encontrado libros", informa al usuario amablemente que no encontraste resultados para su consulta.
+⚠️ No inventes títulos, autores, enlaces ni ninguna otra información. Si no está en el contexto, no lo sabes.
+❌ No respondas preguntas fuera del ámbito académico o bibliotecario (temas personales, salud, etc.).
 `;
 }

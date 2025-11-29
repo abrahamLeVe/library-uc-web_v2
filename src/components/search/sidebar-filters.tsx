@@ -14,6 +14,15 @@ import { SidebarFiltersProps } from "@/lib/definitions";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export default function SidebarFilters({
   facultades,
@@ -191,164 +200,171 @@ export default function SidebarFilters({
   }
 
   return (
-    <aside className="w-full md:w-72 p-4 border rounded-lg space-y-4 bg-card">
-      <h3 className="text-lg font-semibold">Filtros</h3>
-
-      {/* Buscar */}
-      <div>
-        <Label htmlFor="sf-query">Buscar</Label>
-        <Input
-          id="sf-query"
-          type="search"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            updateUrl();
-          }}
-          placeholder="Título, autor, palabra..."
-        />
-      </div>
-
-      {/* Facultad */}
-      <div>
-        <Label htmlFor="sf-facultad">Facultad</Label>
-        <Select
-          value={facultadId ? String(facultadId) : "all"}
-          onValueChange={(v) => {
-            setFacultadId(v === "all" ? null : Number(v));
-            setCarreraId(null);
-            setEspecialidadId(null);
-            updateUrl();
-          }}
-        >
-          <SelectTrigger id="sf-facultad" className="w-full">
-            <SelectValue placeholder="Todas las facultades" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">— Todas —</SelectItem>
-            {facultadesFiltradas.map((f) => (
-              <SelectItem key={f.id} value={String(f.id)}>
-                {f.nombre}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Carrera */}
-      <div>
-        <Label htmlFor="sf-carrera">Carrera</Label>
-        <Select
-          value={carreraId ? String(carreraId) : "all"}
-          onValueChange={(v) => {
-            setCarreraId(v === "all" ? null : Number(v));
-            setEspecialidadId(null);
-            updateUrl();
-          }}
-        >
-          <SelectTrigger id="sf-carrera" className="w-full">
-            <SelectValue
-              placeholder={
-                facultadId || especialidadId
-                  ? "Todas las carreras"
-                  : "Selecciona una facultad o especialidad primero"
-              }
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">— Todas —</SelectItem>
-            {carrerasFiltradas.map((c) => (
-              <SelectItem key={c.id} value={String(c.id)}>
-                {c.nombre}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Especialidad */}
-      <div>
-        <Label htmlFor="sf-especialidad">Especialidad</Label>
-        <Select
-          value={especialidadId ? String(especialidadId) : "all"}
-          onValueChange={(v) => {
-            setEspecialidadId(v === "all" ? null : Number(v));
-            updateUrl();
-          }}
-        >
-          <SelectTrigger id="sf-especialidad" className="w-full">
-            <SelectValue
-              placeholder={
-                carreraId || facultadId
-                  ? "Todas las especialidades"
-                  : "Selecciona una carrera o facultad primero"
-              }
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">— Todas —</SelectItem>
-            {especialidadesFiltradas.map((s) => (
-              <SelectItem key={s.id} value={String(s.id)}>
-                {s.nombre}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Orden */}
-      <div>
-        <Label htmlFor="sf-sort">Orden</Label>
-        <Select
-          value={sortBy}
-          onValueChange={(v) => {
-            setSortBy(v as "az" | "za" | "popular");
-            updateUrl();
-          }}
-        >
-          <SelectTrigger id="sf-sort" className="w-full">
-            <SelectValue placeholder="Ordenar" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="popular">Popular (más asignaciones)</SelectItem>
-            <SelectItem value="az">A - Z</SelectItem>
-            <SelectItem value="za">Z - A</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Rango de años */}
-      {showYearRange && (
+    <Card className="w-full md:w-72">
+      <CardHeader>
+        <CardTitle>Filtros</CardTitle>
+        <CardDescription>
+          Refina los resultados para encontrar lo que buscas.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        {/* Buscar */}
         <div>
-          <Label>Rango de años</Label>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder="Desde"
-              value={yearMin ?? ""}
-              onChange={(e) => {
-                setYearMin(e.target.value ? Number(e.target.value) : null);
-                updateUrl();
-              }}
-            />
-            <Input
-              type="number"
-              placeholder="Hasta"
-              value={yearMax ?? ""}
-              onChange={(e) => {
-                setYearMax(e.target.value ? Number(e.target.value) : null);
-                updateUrl();
-              }}
-            />
-          </div>
+          <Label htmlFor="sf-query">Buscar</Label>
+          <Input
+            id="sf-query"
+            type="search"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              updateUrl();
+            }}
+            placeholder="Título, autor, palabra..."
+          />
         </div>
-      )}
 
-      <div className="flex gap-2">
+        {/* Facultad */}
+        <div>
+          <Label htmlFor="sf-facultad">Facultad</Label>
+          <Select
+            value={facultadId ? String(facultadId) : "all"}
+            onValueChange={(v) => {
+              setFacultadId(v === "all" ? null : Number(v));
+              setCarreraId(null);
+              setEspecialidadId(null);
+              updateUrl();
+            }}
+          >
+            <SelectTrigger id="sf-facultad" className="w-full">
+              <SelectValue placeholder="Todas las facultades" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">— Todas —</SelectItem>
+              {facultadesFiltradas.map((f) => (
+                <SelectItem key={f.id} value={String(f.id)}>
+                  {f.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Carrera */}
+        <div>
+          <Label htmlFor="sf-carrera">Carrera</Label>
+          <Select
+            value={carreraId ? String(carreraId) : "all"}
+            onValueChange={(v) => {
+              setCarreraId(v === "all" ? null : Number(v));
+              setEspecialidadId(null);
+              updateUrl();
+            }}
+          >
+            <SelectTrigger id="sf-carrera" className="w-full">
+              <SelectValue
+                placeholder={
+                  facultadId || especialidadId
+                    ? "Todas las carreras"
+                    : "Selecciona una facultad o especialidad primero"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">— Todas —</SelectItem>
+              {carrerasFiltradas.map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Especialidad */}
+        <div>
+          <Label htmlFor="sf-especialidad">Especialidad</Label>
+          <Select
+            value={especialidadId ? String(especialidadId) : "all"}
+            onValueChange={(v) => {
+              setEspecialidadId(v === "all" ? null : Number(v));
+              updateUrl();
+            }}
+          >
+            <SelectTrigger id="sf-especialidad" className="w-full">
+              <SelectValue
+                placeholder={
+                  carreraId || facultadId
+                    ? "Todas las especialidades"
+                    : "Selecciona una carrera o facultad primero"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">— Todas —</SelectItem>
+              {especialidadesFiltradas.map((s) => (
+                <SelectItem key={s.id} value={String(s.id)}>
+                  {s.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Orden */}
+        <div>
+          <Label htmlFor="sf-sort">Orden</Label>
+          <Select
+            value={sortBy}
+            onValueChange={(v) => {
+              setSortBy(v as "az" | "za" | "popular");
+              updateUrl();
+            }}
+          >
+            <SelectTrigger id="sf-sort" className="w-full">
+              <SelectValue placeholder="Ordenar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="popular">
+                Popular (más asignaciones)
+              </SelectItem>
+              <SelectItem value="az">A - Z</SelectItem>
+              <SelectItem value="za">Z - A</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Rango de años */}
+        {showYearRange && (
+          <div>
+            <Label>Rango de años</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                placeholder="Desde"
+                value={yearMin ?? ""}
+                onChange={(e) => {
+                  setYearMin(e.target.value ? Number(e.target.value) : null);
+                  updateUrl();
+                }}
+              />
+              <Input
+                type="number"
+                placeholder="Hasta"
+                value={yearMax ?? ""}
+                onChange={(e) => {
+                  setYearMax(e.target.value ? Number(e.target.value) : null);
+                  updateUrl();
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="flex gap-2">
         <Button variant="outline" onClick={clearFilters}>
           Limpiar
         </Button>
-      </div>
-    </aside>
+      </CardFooter>
+    </Card>
   );
 }

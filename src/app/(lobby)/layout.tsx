@@ -6,7 +6,9 @@ import { Suspense } from "react";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <HeaderMain />
+      <Suspense fallback={<div className="h-16 bg-gray-900" />}>
+        <HeaderMain />
+      </Suspense>
       <main className="container mx-auto p-2">
         {children}
 

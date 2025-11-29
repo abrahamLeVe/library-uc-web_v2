@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { TableNoResults } from "../common/table-no-results";
-import { getPdfUrl } from "@/lib/s3";
 import { FilterParams, Libros } from "@/lib/definitions";
 
 export default async function SearchTable({
@@ -18,9 +17,11 @@ export default async function SearchTable({
   facultadId,
   carreraId,
   especialidadId,
+  palabraId,
   yearMin,
   yearMax,
   sortBy,
+  autorId,
 }: FilterParams) {
   const libros = await fetchFilteredBooksGlobal({
     query,
@@ -28,20 +29,12 @@ export default async function SearchTable({
     facultadId,
     carreraId,
     especialidadId,
+    palabraId,
     yearMin,
     yearMax,
     sortBy,
+    autorId,
   });
-
-  // 2️⃣ Generar solo la URL firmada de la imagen
-  const librosConImagen = await Promise.all(
-    libros.map(async (libro: Libros) => {
-      const imagen_url_signed = libro.imagen
-        ? await getPdfUrl(libro.imagen, 604800)
-        : null;
-      return { ...libro, imagen: imagen_url_signed };
-    })
-  );
 
   return (
     <Table>
@@ -58,17 +51,20 @@ export default async function SearchTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {librosConImagen.length === 0 ? (
+        {libros.length === 0 ? (
           <TableNoResults />
         ) : (
-          librosConImagen.map((libro: Libros) => (
+          /* ✅ Usamos 'libros' directamente */
+          libros.map((libro: Libros) => (
             <TableRow key={libro.id}>
               <TableCell>
                 {libro.imagen ? (
+                  /* Ahora libro.imagen es la URL completa */
                   <img
                     src={libro.imagen}
                     alt={libro.titulo}
                     className="w-16 h-20 object-cover rounded bg-gray-200"
+                    loading="lazy" // Buena práctica para listas largas
                   />
                 ) : (
                   <div className="w-16 h-20 bg-gray-200 flex items-center justify-center text-gray-500 text-xs">

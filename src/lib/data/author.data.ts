@@ -1,9 +1,6 @@
 import { sql } from "../db";
-import { Autor, Libros } from "../definitions";
+import { Autor } from "../definitions";
 
-/**
- * Traer todos los autores
- */
 export async function fetchAutores(): Promise<Autor[]> {
   try {
     const data = await sql<Autor[]>`
@@ -18,45 +15,5 @@ export async function fetchAutores(): Promise<Autor[]> {
   } catch (error) {
     console.error("Database Error (fetchAutores):", error);
     throw new Error("Failed to fetch authors.");
-  }
-}
-
-/**
- * Traer libros filtrados por autor
- */
-export async function fetchLibrosPorAutor(autorId: number) {
-  try {
-    const data = await sql<Libros[]>`
-      SELECT
-        'sin VP' AS vista_previa,
-        l.id,
-        l.anio_publicacion,
-        l.titulo,
-        l.descripcion,
-        l.isbn,
-        l.editorial,
-        l.idioma,
-        l.paginas,
-        l.pdf_url,
-        l.examen_pdf_url,
-        l.imagen,
-        STRING_AGG(DISTINCT a.nombre, ', ') AS autores,
-        f.nombre AS facultad,
-        c.nombre AS carrera,
-        e.nombre AS especialidad
-      FROM libros l
-      LEFT JOIN libros_autores la ON l.id = la.libro_id
-      LEFT JOIN autores a ON la.autor_id = a.id
-      LEFT JOIN facultades f ON l.facultad_id = f.id
-      LEFT JOIN carreras c ON l.carrera_id = c.id
-      LEFT JOIN especialidades e ON l.especialidad_id = e.id
-      WHERE la.autor_id = ${autorId}
-      GROUP BY l.id, f.nombre, c.nombre, e.nombre
-      ORDER BY l.anio_publicacion DESC, l.titulo ASC
-    `;
-    return data;
-  } catch (error) {
-    console.error("Database Error (fetchLibrosPorAutor):", error);
-    throw new Error("Failed to fetch books by author.");
   }
 }

@@ -102,10 +102,12 @@ export interface FilterParams {
   facultadId?: number | null;
   carreraId?: number | null;
   especialidadId?: number | null;
+  palabraId?: number | null;
   yearMin?: number | null;
   yearMax?: number | null;
   sortBy?: "az" | "za" | "popular";
   page?: string;
+  autorId?: number | null;
 }
 
 export interface SidebarFiltersProps {
@@ -131,4 +133,5 @@ export interface TableEntityProps {
   data: { id: string | number; nombre: string; total_libros: number }[];
   showFilters?: boolean;
   isYearTable?: boolean; // ✅ nueva prop para mostrar filtro por año
+  filterKey?: string; // 2️⃣ Valor por defecto
 }

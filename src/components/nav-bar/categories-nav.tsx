@@ -3,6 +3,7 @@
 import { Facultad } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { buttonVariants } from "../ui/button";
 import { Badge } from "../ui/badge";
 
@@ -12,10 +13,8 @@ interface FacultadesNavProps {
 }
 
 export function FacultadesNav({ facultades, pathname }: FacultadesNavProps) {
-  const isExactPath = (href: string) => pathname === href;
-
-  const variantForPath = (href: string) =>
-    isExactPath(href) ? "default" : "outline";
+  const searchParams = useSearchParams();
+  const currentFacultadId = searchParams.get("facultadId");
 
   return (
     <div className="container flex flex-col lg:h-52 m-auto gap-2 p-2">
@@ -28,14 +27,17 @@ export function FacultadesNav({ facultades, pathname }: FacultadesNavProps) {
       {/* Facultades */}
       <div className="flex flex-wrap items-center lg:h-28 gap-2">
         {facultades.map((fac) => {
-          const href = `/faculty/${fac.id}`;
+          const href = `/search?facultadId=${fac.id}`;
+
+          const isActive = currentFacultadId === fac.id.toString();
+
           return (
             <Link
               key={fac.id}
               href={href}
               className={cn(
-                buttonVariants({ variant: variantForPath(href) }),
-                isExactPath(href) && "pointer-events-none cursor-not-allowed"
+                buttonVariants({ variant: isActive ? "default" : "outline" }),
+                isActive && "pointer-events-none"
               )}
             >
               {fac.nombre}

@@ -3,6 +3,10 @@ import { FilterParams, Libros } from "../definitions";
 
 const ITEMS_PER_PAGE = 8;
 
+// 1️⃣ Definimos la URL base (Asegúrate de que coincida con tu .env)
+const BUCKET_BASE_URL =
+  process.env.NEXT_PUBLIC_BUCKET_URL || "https://tu-bucket.s3.amazonaws.com/";
+
 export async function fetchFilteredBooksGlobal({
   query = "",
   currentPage = 1,
@@ -10,6 +14,8 @@ export async function fetchFilteredBooksGlobal({
   facultadId = null,
   carreraId = null,
   especialidadId = null,
+  autorId = null,
+  palabraId = null, // 🆕 Nuevo parámetro
   yearMin = null,
   yearMax = null,
 }: FilterParams): Promise<Libros[]> {
@@ -37,6 +43,12 @@ export async function fetchFilteredBooksGlobal({
     whereClauses = sql`${whereClauses} AND l.carrera_id = ${carreraId}`;
   if (especialidadId)
     whereClauses = sql`${whereClauses} AND l.especialidad_id = ${especialidadId}`;
+  if (autorId) whereClauses = sql`${whereClauses} AND la.autor_id = ${autorId}`;
+
+  // 🏷️ FILTRO POR PALABRA CLAVE (Nuevo)
+  // Usamos el alias 'lk' que definiremos en el JOIN abajo
+  if (palabraId)
+    whereClauses = sql`${whereClauses} AND lk.palabra_id = ${palabraId}`;
 
   // 📅 Rango de años
   if (yearMin)
@@ -61,9 +73,23 @@ export async function fetchFilteredBooksGlobal({
         l.editorial,
         l.idioma,
         l.paginas,
-        l.pdf_url,
-        l.examen_pdf_url,
-        l.imagen,
+        
+        -- ⚡ URLs OPTIMIZADAS
+        CASE 
+            WHEN l.pdf_url IS NOT NULL THEN ${BUCKET_BASE_URL} || l.pdf_url
+            ELSE NULL 
+        END AS pdf_url,
+
+        CASE 
+            WHEN l.examen_pdf_url IS NOT NULL THEN ${BUCKET_BASE_URL} || l.examen_pdf_url
+            ELSE NULL 
+        END AS examen_pdf_url,
+
+        CASE 
+            WHEN l.imagen IS NOT NULL THEN ${BUCKET_BASE_URL} || l.imagen
+            ELSE NULL 
+        END AS imagen,
+
         COALESCE(f.nombre, '-') AS facultad,
         COALESCE(c.nombre, '-') AS carrera,
         COALESCE(e.nombre, '-') AS especialidad,
@@ -74,9 +100,16 @@ export async function fetchFilteredBooksGlobal({
       LEFT JOIN especialidades e ON l.especialidad_id = e.id
       LEFT JOIN libros_autores la ON l.id = la.libro_id
       LEFT JOIN autores a ON la.autor_id = a.id
+      
+      -- 🆕 JOIN necesario para filtrar por Palabra Clave
+      -- Usamos LEFT JOIN para no perder libros que no tengan palabras clave (si no se filtra)
+      -- El alias es 'lk' (libros_keywords)
+      LEFT JOIN libros_palabras_clave lk ON l.id = lk.libro_id
+
       WHERE 1=1
       ${whereClauses}
-      GROUP BY l.id, f.nombre, c.nombre, e.nombre
+      
+      GROUP BY l.id, f.nombre, c.nombre, e.nombre, l.pdf_url, l.examen_pdf_url, l.imagen
       ${orderClause}
       LIMIT ${ITEMS_PER_PAGE}
       OFFSET ${offset};
@@ -89,11 +122,14 @@ export async function fetchFilteredBooksGlobal({
   }
 }
 
+// Asegúrate de que FilterParams incluya palabraId, o defínelo en los props
 export async function fetchBooksGlobalPages({
   query = "",
   facultadId = null,
   carreraId = null,
   especialidadId = null,
+  autorId = null,
+  palabraId = null, // 🆕 AGREGADO AQUÍ
   yearMin = null,
   yearMax = null,
 }: FilterParams): Promise<number> {
@@ -121,6 +157,11 @@ export async function fetchBooksGlobalPages({
     whereClauses = sql`${whereClauses} AND l.anio_publicacion >= ${yearMin}`;
   if (yearMax)
     whereClauses = sql`${whereClauses} AND l.anio_publicacion <= ${yearMax}`;
+  if (autorId) whereClauses = sql`${whereClauses} AND la.autor_id = ${autorId}`;
+
+  // 🆕 FILTRO AGREGADO
+  if (palabraId)
+    whereClauses = sql`${whereClauses} AND lk.palabra_id = ${palabraId}`;
 
   try {
     const countResult = await sql<{ total: number }[]>`
@@ -131,6 +172,10 @@ export async function fetchBooksGlobalPages({
       LEFT JOIN especialidades e ON l.especialidad_id = e.id
       LEFT JOIN libros_autores la ON l.id = la.libro_id
       LEFT JOIN autores a ON la.autor_id = a.id
+      
+      -- 🆕 JOIN AGREGADO (Necesario para filtrar por palabra clave)
+      LEFT JOIN libros_palabras_clave lk ON l.id = lk.libro_id
+      
       WHERE 1=1
       ${whereClauses};
     `;

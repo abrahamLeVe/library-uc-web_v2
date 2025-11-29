@@ -4,7 +4,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_URL: z
     .string()
     .url("Debe ser una URL válida.")
-    .default("http://localhost:3000"),
+    .default("http://localhost:3001"),
 });
 
 const { success, data, error } = envSchema.safeParse(process.env);

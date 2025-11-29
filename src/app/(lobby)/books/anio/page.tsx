@@ -1,8 +1,6 @@
-import { TableSkeleton } from "@/components/common/skeleton-entity";
 import TableEntity from "@/components/common/table-entity";
 import { fetchLibrosPorAnioAll } from "@/lib/data/entity.data";
 import { Metadata } from "next";
-import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Libros por fecha de publicación",
@@ -19,15 +17,13 @@ export default async function Page() {
         Buscar por fecha de publicación
       </h2>
       <div className="flex justify-center">
-        <Suspense fallback={<TableSkeleton col1="Año" />}>
-          <TableEntity
-            titleCol="Año"
-            basePath="/books/anio"
-            data={aniosData}
-            showFilters
-            isYearTable
-          />
-        </Suspense>
+        <TableEntity
+          titleCol="Año"
+          basePath="/search"
+          data={aniosData}
+          showFilters
+          isYearTable
+        />
       </div>
     </>
   );

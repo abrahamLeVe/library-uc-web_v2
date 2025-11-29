@@ -1,4 +1,4 @@
-import { ReactNode, Suspense } from "react";
+import { ReactNode } from "react";
 
 import SidebarFilters from "@/components/search/sidebar-filters";
 import { fetchCarreras } from "@/lib/data/career.data";
@@ -18,14 +18,12 @@ export default async function SearchLayout({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
-      <Suspense fallback={<div>Cargando filtros...</div>}>
-        <SidebarFilters
-          facultades={facultades}
-          carreras={carreras}
-          especialidades={especialidades}
-          carrerasEspecialidades={carrerasEspecialidades}
-        />
-      </Suspense>
+      <SidebarFilters
+        facultades={facultades}
+        carreras={carreras}
+        especialidades={especialidades}
+        carrerasEspecialidades={carrerasEspecialidades}
+      />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>
   );

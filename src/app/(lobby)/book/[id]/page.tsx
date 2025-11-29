@@ -1,6 +1,6 @@
 import LibroNoEncontrado from "@/components/book-no-found";
 import { fetchAllLibros, fetchLibroPorId } from "@/lib/data/book.data";
-import { getPdfUrl } from "@/lib/s3";
+
 import { getYouTubeEmbedUrl } from "@/lib/utils";
 import { Metadata } from "next";
 
@@ -17,24 +17,15 @@ export const revalidate = 60;
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
+
   if (isNaN(id as unknown as number)) {
     return <LibroNoEncontrado />;
   }
+
   const libro = await fetchLibroPorId(Number(id));
+
   if (!libro) return <LibroNoEncontrado />;
 
-  // URLs firmadas
-  const imagen_url_signed = libro.imagen
-    ? await getPdfUrl(libro.imagen, 604800)
-    : null;
-  const pdf_url_signed = libro.pdf_url
-    ? await getPdfUrl(libro.pdf_url, 604800)
-    : null;
-  const examen_url_signed = libro.examen_pdf_url
-    ? await getPdfUrl(libro.examen_pdf_url, 604800)
-    : null;
-
-  // Generar URLs embebidas de YouTube
   const embedUrls = (libro.video_urls || [])
     .map((url) => getYouTubeEmbedUrl(url))
     .filter(Boolean);
@@ -44,11 +35,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       <h1 className="text-2xl md:text-4xl font-bold">{libro.titulo}</h1>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Imagen */}
         <div className="flex-shrink-0 md:sticky top-1 h-full">
-          {imagen_url_signed ? (
+          {libro.imagen ? (
             <img
-              src={imagen_url_signed}
+              src={libro.imagen}
               alt={libro.titulo}
               className="w-72 h-auto rounded shadow bg-gray-200"
               loading="eager"
@@ -60,7 +50,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           )}
         </div>
 
-        {/* Información del libro */}
         <div className="flex-1 space-y-3">
           <p>
             <span className="font-semibold">Año de publicación:</span>{" "}
@@ -97,29 +86,28 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
             {libro.paginas ?? "-"}
           </p>
 
-          {/* Descripción */}
           <div>
             <h2 className="font-semibold text-lg">Descripción:</h2>
             <p>{libro.descripcion ?? "No disponible"}</p>
           </div>
 
-          {/* Descargas */}
           <div className="space-x-4 pt-2">
-            {pdf_url_signed && (
+            {libro.pdf_url && (
               <a
-                href={pdf_url_signed}
+                href={libro.pdf_url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
               >
                 Descargar PDF
               </a>
             )}
-            {examen_url_signed && (
+
+            {libro.examen_pdf_url && (
               <a
-                href={examen_url_signed}
+                href={libro.examen_pdf_url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
               >
                 Descargar Material
@@ -127,7 +115,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
             )}
           </div>
 
-          {/* Videos de YouTube */}
           {embedUrls.length > 0 && (
             <div className="mt-6 space-y-6">
               <h2 className="font-semibold text-lg mb-2">

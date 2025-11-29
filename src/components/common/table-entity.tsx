@@ -1,6 +1,6 @@
 "use client";
 
-import { TableEntityProps } from "@/lib/definitions";
+import { Entity, TableEntityProps } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -33,6 +33,7 @@ export default function TableEntity({
   data,
   showFilters = false,
   isYearTable = false,
+  filterKey = "id", // 2️⃣ Valor por defecto
 }: TableEntityProps) {
   const ITEMS_PER_PAGE = 10;
 
@@ -84,6 +85,14 @@ export default function TableEntity({
     setLetter(null);
     setYearRange([0, 2050]);
     setCurrentPage(1);
+  };
+
+  const generateLink = (item: Entity) => {
+    if (isYearTable) {
+      return `${basePath}?yearMin=${item.nombre}&yearMax=${item.nombre}`;
+    }
+
+    return `${basePath}?${filterKey}=${item.id}`;
   };
 
   return (
@@ -205,8 +214,9 @@ export default function TableEntity({
               paginatedData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
+                    {/* 4️⃣ AQUI USAMOS LA NUEVA LÓGICA DE LINK */}
                     <Link
-                      href={`${basePath}/${item.id}?name=${item.nombre}`}
+                      href={generateLink(item)}
                       className={cn(buttonVariants({ variant: "default" }))}
                     >
                       {item.total_libros}
@@ -216,8 +226,9 @@ export default function TableEntity({
                     title={item.nombre}
                     className="font-medium truncate"
                   >
+                    {/* 4️⃣ AQUI TAMBIÉN */}
                     <Link
-                      href={`${basePath}/${item.id}?name=${item.nombre}`}
+                      href={generateLink(item)}
                       className={cn(buttonVariants({ variant: "link" }))}
                     >
                       {item.nombre}
