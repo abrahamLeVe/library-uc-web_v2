@@ -2,8 +2,8 @@
 
 import { Entity, TableEntityProps } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import ScrollLink from "../scroll-link";
 import { Button, buttonVariants } from "../ui/button";
 import { Card } from "../ui/card";
 import { Input } from "../ui/input";
@@ -214,25 +214,25 @@ export default function TableEntity({
               paginatedData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    {/* 4️⃣ AQUI USAMOS LA NUEVA LÓGICA DE LINK */}
-                    <Link
+                    <ScrollLink // <-- USAR SCROLLLINK
                       href={generateLink(item)}
                       className={cn(buttonVariants({ variant: "default" }))}
+                      // ❌ Eliminar scroll={true}
                     >
                       {item.total_libros}
-                    </Link>
+                    </ScrollLink>
                   </TableCell>
                   <TableCell
                     title={item.nombre}
                     className="font-medium truncate"
                   >
-                    {/* 4️⃣ AQUI TAMBIÉN */}
-                    <Link
+                    <ScrollLink // <-- USAR SCROLLLINK
                       href={generateLink(item)}
                       className={cn(buttonVariants({ variant: "link" }))}
+                      // ❌ Eliminar scroll={true}
                     >
                       {item.nombre}
-                    </Link>
+                    </ScrollLink>
                   </TableCell>
                 </TableRow>
               ))

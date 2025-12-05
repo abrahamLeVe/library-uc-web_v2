@@ -56,51 +56,53 @@ export default function SidebarFilters({
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const updateUrl = useDebouncedCallback(() => {
+  const updateUrl = useDebouncedCallback((overrides = {}) => {
     const params = new URLSearchParams(searchParams);
+
+    // 1. Siempre reseteamos a la página 1 al filtrar
     params.set("page", "1");
 
-    if (query) {
-      params.set("query", query);
-    } else {
-      params.delete("query");
-    }
+    params.delete("palabraId");
 
-    if (facultadId) {
-      params.set("facultadId", String(facultadId));
-    } else {
-      params.delete("facultadId");
-    }
+    const currentQuery =
+      overrides.query !== undefined ? overrides.query : query;
+    const currentFacultadId =
+      overrides.facultadId !== undefined ? overrides.facultadId : facultadId;
+    const currentCarreraId =
+      overrides.carreraId !== undefined ? overrides.carreraId : carreraId;
+    const currentEspecialidadId =
+      overrides.especialidadId !== undefined
+        ? overrides.especialidadId
+        : especialidadId;
+    const currentYearMin =
+      overrides.yearMin !== undefined ? overrides.yearMin : yearMin;
+    const currentYearMax =
+      overrides.yearMax !== undefined ? overrides.yearMax : yearMax;
+    const currentSortBy =
+      overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
 
-    if (carreraId) {
-      params.set("carreraId", String(carreraId));
-    } else {
-      params.delete("carreraId");
-    }
+    // Actualizamos params según los valores vigentes
+    if (currentQuery) params.set("query", currentQuery);
+    else params.delete("query");
 
-    if (especialidadId) {
-      params.set("especialidadId", String(especialidadId));
-    } else {
-      params.delete("especialidadId");
-    }
+    if (currentFacultadId) params.set("facultadId", String(currentFacultadId));
+    else params.delete("facultadId");
 
-    if (yearMin) {
-      params.set("yearMin", String(yearMin));
-    } else {
-      params.delete("yearMin");
-    }
+    if (currentCarreraId) params.set("carreraId", String(currentCarreraId));
+    else params.delete("carreraId");
 
-    if (yearMax) {
-      params.set("yearMax", String(yearMax));
-    } else {
-      params.delete("yearMax");
-    }
+    if (currentEspecialidadId)
+      params.set("especialidadId", String(currentEspecialidadId));
+    else params.delete("especialidadId");
 
-    if (sortBy) {
-      params.set("sortBy", sortBy);
-    } else {
-      params.delete("sortBy");
-    }
+    if (currentYearMin) params.set("yearMin", String(currentYearMin));
+    else params.delete("yearMin");
+
+    if (currentYearMax) params.set("yearMax", String(currentYearMax));
+    else params.delete("yearMax");
+
+    if (currentSortBy) params.set("sortBy", currentSortBy);
+    else params.delete("sortBy");
 
     replace(`${pathname}?${params.toString()}`);
   }, 300);
@@ -188,14 +190,18 @@ export default function SidebarFilters({
     setSortBy("popular");
 
     const params = new URLSearchParams(searchParams);
+
+    // Borramos todo lo conocido y lo "extra" como palabraId
     params.delete("query");
     params.delete("facultadId");
     params.delete("carreraId");
     params.delete("especialidadId");
     params.delete("yearMin");
     params.delete("yearMax");
+    params.delete("palabraId"); // <--- Agregado aquí también
     params.set("sortBy", "popular");
     params.set("page", "1");
+
     replace(`${pathname}?${params.toString()}`);
   }
 

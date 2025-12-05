@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PalabraClaveFull } from "@/lib/definitions";
 import { XIcon } from "lucide-react";
-import Link from "next/link";
 import { SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { ClientPagination } from "../common/client-pagination";
+import ScrollLink from "../scroll-link";
 import {
   Accordion,
   AccordionContent,
@@ -403,15 +403,14 @@ export function KeywordBadgesAdvanced({
                   : "bg-white/80 text-slate-800";
 
               return (
-                <Link
+                <ScrollLink // <-- USAR SCROLLLINK AQUÍ
                   key={k.id}
-                  // 🔄 CAMBIO AQUÍ: Apuntamos al buscador global enviando el ID de la palabra clave
                   href={`/search?page=1&palabraId=${k.id}&sortBy=popular`}
                   className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${variantClass} shadow-sm hover:scale-105 transform transition`}
                 >
                   <span className="font-medium">{k.nombre}</span>
                   <span className="text-xs opacity-80">({k.total_libros})</span>
-                </Link>
+                </ScrollLink> // <-- CERRAR CON SCROLLLINK
               );
             })
           ) : (

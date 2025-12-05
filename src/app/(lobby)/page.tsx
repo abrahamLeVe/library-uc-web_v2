@@ -1,10 +1,8 @@
 import TableEntity from "@/components/common/table-entity";
-import { KeywordBadgesAdvanced } from "@/components/keywords/keywords-badges";
 import {
   fetchEntityConLibrosAll,
   fetchLibrosPorAnioAll,
 } from "@/lib/data/entity.data";
-import { fetchPalabrasClaveFullData } from "@/lib/data/Keywords.data";
 
 import { Metadata } from "next";
 
@@ -34,8 +32,6 @@ export default async function StatisticsPage() {
       }),
       fetchLibrosPorAnioAll(),
     ]);
-
-  const palabrasClaveData = await fetchPalabrasClaveFullData();
 
   return (
     <>
@@ -69,8 +65,6 @@ export default async function StatisticsPage() {
           isYearTable={true}
         />
       </div>
-
-      <KeywordBadgesAdvanced data={palabrasClaveData} />
     </>
   );
 }

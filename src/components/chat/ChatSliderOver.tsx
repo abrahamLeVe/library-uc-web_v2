@@ -96,7 +96,7 @@ export default function ChatSliderOver() {
       </SheetTrigger>
 
       <SheetContent className="pt-20">
-        <SheetHeader className="flex flex-row fixed top-0 w-full border-b-2 bg-white z-10">
+        <SheetHeader className="flex flex-row fixed top-0 w-full border-b-2  z-10">
           <img
             src="/botProfile.png"
             alt="chat bot"
@@ -114,7 +114,7 @@ export default function ChatSliderOver() {
             {displayedMessages.map((message) => (
               <Card
                 key={message.id}
-                className={cn("relative my-4 w-fit p-1", {
+                className={cn("relative my-4 w-fit", {
                   "ml-auto": message.role === "user",
                   "bg-gray-950 text-white": message.role === "assistant",
                 })}

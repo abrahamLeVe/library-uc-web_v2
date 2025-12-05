@@ -1,9 +1,16 @@
 import ChatSliderOver from "@/components/chat/ChatSliderOver";
 import Footer from "@/components/footer/footer-index";
+import { KeywordBadgesAdvanced } from "@/components/keywords/keywords-badges";
 import HeaderMain from "@/components/nav-bar/header-main";
+import { fetchPalabrasClaveFullData } from "@/lib/data/Keywords.data";
 import { Suspense } from "react";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const palabrasClaveData = await fetchPalabrasClaveFullData();
   return (
     <>
       <Suspense fallback={<div className="h-16 bg-gray-900" />}>
@@ -21,6 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <ChatSliderOver />
           </Suspense>
         </div>
+        <KeywordBadgesAdvanced data={palabrasClaveData} />
       </main>
       <Footer />
     </>

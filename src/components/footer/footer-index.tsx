@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { buttonVariants } from "../ui/button";
+import ScrollLink from "../scroll-link";
 
 export default async function Footer() {
   const facultades = await fetchFacultadesByBooks();
@@ -17,6 +18,14 @@ export default async function Footer() {
       href: "/books/keywords",
     },
   ];
+
+  const handleScrollToTop = () => {
+    // Usamos setTimeout(0) para asegurarnos de que se ejecute después
+    // de cualquier lógica de navegación o renderizado.
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
+  };
 
   return (
     <footer className="border-t  from-white/50 to-gray-50 mt-10">
@@ -74,15 +83,16 @@ export default async function Footer() {
                   const href = `/search?facultadId=${fac.id}`;
                   return (
                     <li key={fac.id}>
-                      <Link
+                      <ScrollLink // <-- USAR SCROLLLINK
                         href={href}
-                        className={cn(buttonVariants({ variant: "link" }))}
+                        className={cn(buttonVariants({ variant: "link" }))} // ❌ Eliminar scroll={true}
                       >
                         {fac.nombre}
+
                         <Badge variant="secondary" className="ml-2">
                           {fac.total_libros && fac.total_libros}
                         </Badge>
-                      </Link>
+                      </ScrollLink>
                     </li>
                   );
                 })}
